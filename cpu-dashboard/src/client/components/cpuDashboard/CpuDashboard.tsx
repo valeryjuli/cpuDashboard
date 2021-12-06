@@ -10,7 +10,7 @@ import { cpuUsage } from 'process';
 /**
  * Maximum number of data points to store on frontend side.
  */
-const MAX_DATA_POINTS = 5;
+const MAX_DATA_POINTS = 50;
 /**
  * Start CPU data context value.
  */
@@ -35,7 +35,7 @@ const CpuDashboard = () => {
     dataLoader = new CPUDataLoader(MAX_DATA_POINTS);
     const loadDataInterval = setInterval(() => {
       loadCPULoadData();
-    }, 5000);
+    }, 500);
     
     return () => clearInterval(loadDataInterval);
   }, [])

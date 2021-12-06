@@ -3,8 +3,6 @@ import { CPULoadData } from '../../cpuDashboard/CpuDashboard';
 import * as d3 from 'd3';
 import './CpuLoadChart.css';
 import { CPULoadDataPoint } from '../../dataLoader/data-types';
-import { anyTypeAnnotation } from '@babel/types';
-import cpuLoad from '../../../../server/cpuLoad';
 
 /**
  * SVG Plot container viewbox dimmensions
@@ -20,10 +18,8 @@ function CpuLoadChart() {
   useEffect(() => {
   }, [cpuLoadData])
 
-  const targetSVG = d3.select(svgReference.current);
-
-    const yMinValue = d3.min(cpuLoadData.queue, (d) => d.cpuLoad) as any,
-        yMaxValue = d3.max(cpuLoadData.queue, (d) => d.cpuLoad) as any;
+    const yMinValue = d3.min(cpuLoadData.queue, (d) => d.cpuLoad) as number;
+    const yMaxValue = d3.max(cpuLoadData.queue, (d) => d.cpuLoad) as number;
 
     // Set scaling
     const getX = d3
@@ -33,7 +29,7 @@ function CpuLoadChart() {
 
     const getY = d3
       .scaleLinear()
-      .domain([yMinValue - 1, yMaxValue + 2])
+      .domain([yMinValue, yMaxValue])
       .range([VIEWBOX_HEIGHT, 0]);
 
     // Getters for axis values
@@ -49,13 +45,8 @@ function CpuLoadChart() {
 
     const linePath = d3
         .line<CPULoadDataPoint>()
-        .x((d) => {
-          console.log('X', d, getX(new Date(d.timestamp)))
-          return getX(new Date(d.timestamp))
-        })
-        .y((d) => {
-          console.log('Y', getY(d.cpuLoad))
-          return getY(d.cpuLoad)})
+        .x((d) => getX(new Date(d.timestamp)))
+        .y((d) => getY(d.cpuLoad))
         .curve(d3.curveMonotoneX)(cpuLoadData.queue);
 
     const areaPath = d3

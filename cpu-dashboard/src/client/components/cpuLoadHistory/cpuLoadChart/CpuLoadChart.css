@@ -4,6 +4,7 @@
 }
 
 .load-chart-svg {
-    height: 100%;
-    margin: 0px;
+    max-height: 100%;
+    max-width: 100%;
+    padding: 1%;
 }
