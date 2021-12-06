@@ -1,10 +1,13 @@
+import CpuLoadAlerts from './cpuLoadAlerts/CpuLoadAlerts';
+import CpuLoadChart from './cpuLoadChart/CpuLoadChart';
 import './CpuLoadHistory.css';
 
 function CpuLoadHistory() {
   return (
-    <div className="App">
-      <header className="App-header">
-      </header>
+    <div className="cpu-load-history">
+      <h1>CPU Load History</h1>
+      <CpuLoadChart />
+      <CpuLoadAlerts />
     </div>
   );
 }

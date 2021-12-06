@@ -1,0 +1,6 @@
+.cpu-load-history {
+    background-color: rosybrown;
+    grid-area: hist;
+    display: flex;
+    flex-direction: column;
+}

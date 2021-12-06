@@ -1,0 +1,9 @@
+.cpu-load-chart {
+    background-color: whitesmoke;
+    flex: 1;
+}
+
+.load-chart-svg {
+    height: 100%;
+    margin: 0px;
+}

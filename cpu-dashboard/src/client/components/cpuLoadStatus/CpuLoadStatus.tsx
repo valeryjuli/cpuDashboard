@@ -2,9 +2,8 @@ import './CpuLoadStatus.css';
 
 function CpuLoadStatus() {
   return (
-    <div className="App">
-      <header className="App-header">
-      </header>
+    <div className="cpu-load-status">
+      <h1>CPU Load Status</h1>
     </div>
   );
 }
