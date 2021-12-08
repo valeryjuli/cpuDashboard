@@ -1,13 +1,13 @@
+import { CPUDataGlobalState } from '../dataLoader/data-types';
 import CpuLoadAlerts from './cpuLoadAlerts/CpuLoadAlerts';
 import CpuLoadChart from './cpuLoadChart/CpuLoadChart';
 import './CpuLoadHistory.css';
 
-function CpuLoadHistory() {
+function CpuLoadHistory(props: CPUDataGlobalState) {
   return (
     <div className="cpu-load-history">
-      <h1>CPU Load History</h1>
-      <CpuLoadChart />
-      <CpuLoadAlerts />
+      <CpuLoadChart {...props} />
+      <CpuLoadAlerts {...props}/>
     </div>
   );
 }

@@ -45,4 +45,11 @@ export class Queue<T> {
   toArray(): Array<T> {
     return this.queue;
   };
+
+  /**
+   * return queue length
+   */
+  size(): number {
+    return this.queue.length;
+  };
 }

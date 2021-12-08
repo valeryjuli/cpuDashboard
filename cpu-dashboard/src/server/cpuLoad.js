@@ -13,7 +13,7 @@ const NUM_CPU = os.cpus().length;
 const getCurrentCpuLoadData = (req, res) => {
   const lastMinuteLoadavg = os.loadavg();
     const cpuLoadPoint = {
-      cpuLoad: lastMinuteLoadavg[0] / NUM_CPU,
+      cpuLoad: (lastMinuteLoadavg[0]) ,
       timestamp: new Date(Date.now()),
     }
     res.status(200).send(cpuLoadPoint);

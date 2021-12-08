@@ -2,25 +2,25 @@ import { useEffect, useState, createContext } from 'react';
 import { Queue } from '../../../dataStructures/queue';
 import CpuLoadHistory from '../cpuLoadHistory/CpuLoadHistory';
 import CpuLoadStatus from '../cpuLoadStatus/CpuLoadStatus';
-import { CPUDataContextState, CPULoadDataPoint } from '../dataLoader/data-types';
+import { CPUDataGlobalState, CPULoadDataPoint } from '../dataLoader/data-types';
 import { CPUDataLoader } from '../dataLoader/data-loader';
 import './CpuDashboard.css';
-import { cpuUsage } from 'process';
 
 /**
  * Maximum number of data points to store on frontend side.
  */
-const MAX_DATA_POINTS = 50;
+export const MAX_DATA_POINTS = 60;
+/**
+ * Frequency in ms to push new data to the history queue.
+ */
+export const MONITOR_FREQ = 500;
+
 /**
  * Start CPU data context value.
  */
-const defaultCpuDataContextState: CPUDataContextState = {
+const initialCpuLoadDataState: CPUDataGlobalState = {
   cpuLoadData: new Queue<CPULoadDataPoint>(MAX_DATA_POINTS),
 }
-/**
- * Context guarding the cpu data queue state.
- */
-export const CPULoadData = createContext<CPUDataContextState>(defaultCpuDataContextState);
 
 /**
  * Main component that updates every 10s the CPULoadData context with the cpu load data
@@ -29,20 +29,16 @@ export const CPULoadData = createContext<CPUDataContextState>(defaultCpuDataCont
 const CpuDashboard = () => {
 
   let dataLoader: CPUDataLoader;
-  const [cpuLoadData, setCpuLoadData] = useState<CPUDataContextState>(defaultCpuDataContextState);
+  const [cpuLoadData, setCpuLoadData] = useState<CPUDataGlobalState>(initialCpuLoadDataState);
 
   useEffect(() => {
     dataLoader = new CPUDataLoader(MAX_DATA_POINTS);
     const loadDataInterval = setInterval(() => {
       loadCPULoadData();
-    }, 500);
+    }, MONITOR_FREQ);
     
     return () => clearInterval(loadDataInterval);
   }, [])
-  
-  useEffect(() => {
-    console.log('UPDATED', cpuLoadData);
-  }, [cpuLoadData])
 
   /**
    * Load data to dataQueue and update context state
@@ -50,18 +46,14 @@ const CpuDashboard = () => {
   const loadCPULoadData = async () => {
     await dataLoader.enqueueCPULoadStatistic();
     setCpuLoadData(
-      {...cpuLoadData ,
-      cpuLoadData :dataLoader.dataHistory
+      {cpuLoadData : dataLoader.dataHistory
     });
   }
 
   return (
     <div className="cpu-dashboard-container">
-      <CPULoadData.Provider 
-        value={cpuLoadData} >
-        <CpuLoadStatus />
-        <CpuLoadHistory />
-      </CPULoadData.Provider >
+        <CpuLoadStatus {...cpuLoadData}/>
+        <CpuLoadHistory {...cpuLoadData}/>
     </div>
   );
 }

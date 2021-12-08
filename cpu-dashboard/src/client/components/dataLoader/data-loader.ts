@@ -1,5 +1,15 @@
 import { Queue } from "../../../dataStructures/queue";
-import { CPULoadDataPoint } from "./data-types";
+import { MAX_DATA_POINTS } from "../cpuDashboard/CpuDashboard";
+import { CPULoadAlertTypes, CPULoadDataPoint } from "./data-types";
+
+/**
+* Threshold to trigger a CPU load alert.
+*/
+const CPU_ALERT_THRESHOLD = 25;
+/**
+* Threshold to classify cpu load recovery.
+*/
+const CPU_RECOVERY_THRESHOLD = 3;
 
 /**
  * Loads CPU average load data points to a dataHistory queue with a specified max length.
@@ -14,6 +24,23 @@ export class CPUDataLoader {
         this.dataHistory = new Queue(maxDataPoints);
     }
 
+    verifyRecovery(cpuLoad: number) {
+        if (this.dataHistory.queue.length > 12) {
+            // Datapoint of 2 minutes ago is -12 index
+            const startWindowLoad = this.dataHistory.queue[this.dataHistory.queue.length  - 12].cpuLoad * 100;
+            if (startWindowLoad - cpuLoad > CPU_RECOVERY_THRESHOLD) return true
+            return false;
+        }
+        return false;
+    }
+
+    verifyOverload(): boolean {
+        if (this.dataHistory.queue.length > 12) {
+            return this.dataHistory.queue.slice(-12).every((cpuData) => cpuData.cpuLoad > CPU_ALERT_THRESHOLD);
+        }
+        return false;
+    }
+
     /**
      * Enqueue on the data history the latest cpu load
      * @returns a cpu load data with average cpu load and timestamp
@@ -23,7 +50,16 @@ export class CPUDataLoader {
         return fetch(request)
             .then((response: any) => response.json())
             .then((cpuLoadData: CPULoadDataPoint) => {
-                this.dataHistory.enqueue(cpuLoadData);
+                const currCpuLoad = cpuLoadData.cpuLoad * 100;
+                const cpuLoadDataPoint = {
+                    cpuLoad: currCpuLoad,
+                    timestamp: cpuLoadData.timestamp,
+                    isAlert: 
+                            this.verifyOverload() ? 
+                            CPULoadAlertTypes.OVERLOAD : 
+                            this.verifyRecovery(currCpuLoad) ? CPULoadAlertTypes.RECOVERY : undefined,
+                }
+                this.dataHistory.enqueue(cpuLoadDataPoint);
                 return cpuLoadData
             })
     }
